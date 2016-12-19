@@ -1,0 +1,110 @@
+
+#####---->MAIN<----#####
+GET_NEXT_LINE
+FIND_FD
+fd after find_fd = 3
+While ret != 0 call my_read
+##ENTER MY_READ
+Read function
+Test fd = 3
+###BUFF = test
+
+test
+##FT_STRCPY content = test
+
+test
+Ret after read = 10
+CONTENT before ft_strchr = test
+
+test
+FT_STRCHR \n kill the loop
+IF lst->content is : 0x7fcbdb403290strchr start at test
+
+test
+## LINE RES = test
+test = test#bob
+#GNL : return 0
+
+
+#####---->MAIN<----#####
+GET_NEXT_LINE
+FIND_FD
+lst->fd == fd
+GNL : fd already exist
+fd after find_fd = 3
+While ret != 0 call my_read
+##ENTER MY_READ
+Read function
+Test fd = 3
+###BUFF = 
+
+Ret after read = 1
+CONTENT before ft_strchr = 
+test
+
+FT_STRCHR \n kill the loop
+IF lst->content is : 0x7fcbdb4032c0strchr start at 
+test
+
+## LINE RES = 
+test = #bob
+#GNL : return 0
+
+
+#####---->MAIN<----#####
+GET_NEXT_LINE
+FIND_FD
+lst->fd == fd
+GNL : fd already exist
+fd after find_fd = 3
+While ret != 0 call my_read
+##ENTER MY_READ
+Read function
+Test fd = 3
+##Read EOF
+Ret after read = 0
+CONTENT before ft_strchr = test
+
+FT_STRCHR \n kill the loop
+IF lst->content is : 0x7fcbdb4032e0strchr start at test
+
+## LINE RES = test
+test = test#bob
+#GNL : return 0
+
+
+#####---->MAIN<----#####
+GET_NEXT_LINE
+FIND_FD
+lst->fd == fd
+GNL : fd already exist
+fd after find_fd = 3
+While ret != 0 call my_read
+##ENTER MY_READ
+Read function
+Test fd = 3
+##Read EOF
+Ret after read = 0
+CONTENT before ft_strchr = 
+IF lst->content is : 0x7fcbdb403300
+test = #bob
+#GNL : return 0
+
+
+#####---->MAIN<----#####
+GET_NEXT_LINE
+FIND_FD
+lst->fd == fd
+GNL : fd already exist
+fd after find_fd = 3
+While ret != 0 call my_read
+##ENTER MY_READ
+Read function
+Test fd = 3
+##Read EOF
+Ret after read = 0
+CONTENT before ft_strchr = 
+IF lst->content is : 0x7fcbdb403300
+test = #bob
+#GNL : return 0
+
