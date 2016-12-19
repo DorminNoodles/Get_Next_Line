@@ -6,14 +6,14 @@
 /*   By: lchety <lchety@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/11 13:40:11 by lchety            #+#    #+#             */
-/*   Updated: 2016/12/18 16:00:55 by lchety           ###   ########.fr       */
+/*   Updated: 2016/12/19 13:46:59 by lchety           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# define BUFF_SIZE 10
+# define BUFF_SIZE 16
 
 typedef struct s_line_lst t_line_lst;
 typedef struct s_proto t_proto;

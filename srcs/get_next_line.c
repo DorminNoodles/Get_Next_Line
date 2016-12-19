@@ -6,7 +6,7 @@
 /*   By: lchety <lchety@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/11 13:40:16 by lchety            #+#    #+#             */
-/*   Updated: 2016/12/18 17:41:36 by lchety           ###   ########.fr       */
+/*   Updated: 2016/12/19 14:22:45 by lchety           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 
 int		find_fd(int fd, t_fd_lst *lst, t_fd_lst **tmp)
 {
-	printf("FIND_FD\n");
+	//printf("FIND_FD\n");
 
 	if (!lst)
 		return (0);
 	if (lst->fd == fd)
 	{
-		printf("lst->fd == fd\n");
+		//printf("lst->fd == fd\n");
 		*tmp = lst;
 		return (1);
 	}
@@ -50,22 +50,19 @@ int		find_fd(int fd, t_fd_lst *lst, t_fd_lst **tmp)
 
 int		my_read(t_fd_lst *lst)
 {
-	printf("##ENTER MY_READ\n");
+	//printf("##ENTER MY_READ\n");
 	size_t ret;
 	char buff[BUFF_SIZE + 1];
 
 	ret = 0;
-	printf("Read function\n");
-	printf("Test fd = %d\n", lst->fd);
+	//printf("Read function\n");
+	//printf("Test fd = %d\n", lst->fd);
 	ret = read(lst->fd, buff, BUFF_SIZE);
 
 	if (ret < 1)
-	{
-		printf("##Read EOF\n");
-		return (0);
-	}
+		return (ret);
 	buff[ret] = '\0';
-	printf("###BUFF = %s\n", buff);
+	//printf("###BUFF = %s\n", buff);
 
 	if (lst->content)
 	{
@@ -75,7 +72,7 @@ int		my_read(t_fd_lst *lst)
 	{
 		lst->content = ft_strnew(strlen(buff));
 		ft_strcpy(lst->content, buff);
-		printf("##FT_STRCPY content = %s\n", lst->content);
+		//printf("##FT_STRCPY content = %s\n", lst->content);
 	}
 
 	//if read dont return 0 and no /n
@@ -93,13 +90,13 @@ int		punchline(t_fd_lst *lst, char **line)
 		return (0);
 	tmp = lst->content;
 	cut = ft_strchr(lst->content,'\n');
-
-	printf("IF lst->content is : %d", *lst->content);
-	printf("\n");
+	//
+	// printf("IF lst->content is : %d", *lst->content);
+	// printf("\n");
 
 	if (cut)
 	{
-		printf("strchr start at %s\n", lst->content);
+		//printf("strchr start as %s\n", lst->content);
 		*line = (char*)ft_memalloc(sizeof(char) * (cut - lst->content));
 		*line = ft_strncpy(*line, lst->content, cut - lst->content);
 		*(*line + (cut - lst->content)) = '\0';
@@ -107,7 +104,7 @@ int		punchline(t_fd_lst *lst, char **line)
 		lst->content = (char*)malloc(sizeof(char) * ft_strlen(cut + 1));
 		ft_strcpy(lst->content, cut + 1);
 
-		printf("## LINE RES = %s", *line);
+		//printf("## LINE RES = %s", *line);
 
 		//send to line
 		//1 cut
@@ -118,7 +115,7 @@ int		punchline(t_fd_lst *lst, char **line)
 	}
 	else
 	{
-		printf("RECHERCHE QUI MET CONTENT A 0\n");
+		//printf("RECHERCHE QUI MET CONTENT A 0\n");
 		*line = ft_strcpy(*line, lst->content);
 		return (1);
 		lst->content = NULL;
@@ -130,17 +127,15 @@ int		punchline(t_fd_lst *lst, char **line)
 
 int		get_next_line(int fd, char **line)
 {
-	printf("GET_NEXT_LINE\n");
+	//printf("GET_NEXT_LINE\n");
 	int ret;
 	static t_fd_lst	*lst = NULL;
 	t_fd_lst *tmp;
 
 	ret = 1;
-	if (fd == -1)
+	if (fd < 0 || !line)
 		return (-1);
-	if (find_fd(fd, lst, &tmp))
-		printf("GNL : fd already exist\n");
-	else
+	if (!find_fd(fd, lst, &tmp))
 	{
 		tmp = (t_fd_lst*)malloc(sizeof(t_fd_lst));
 		tmp->next = NULL;
@@ -156,32 +151,36 @@ int		get_next_line(int fd, char **line)
 			lst = tmp;
 		}
 	}
-
-	printf("fd after find_fd = %d\n", tmp->fd);
-
+	//printf("fd after find_fd = %d\n", tmp->fd);
 
 	while (ret > 0)
 	{
-		printf("While ret != 0 call my_read\n");
+		//printf("While ret != 0 call my_read\n");
 		ret = my_read(tmp);
 		if (ret == 0)
 			tmp->eof = 1;
-		printf("Ret after read = %d\n", ret);
+		if (ret == -1)
+			return (-1);
+		//printf("Ret after read = %d\n", ret);
 
 		if (tmp->content)
 		{
-			printf("CONTENT before ft_strchr = %s\n", tmp->content);
+			//printf("CONTENT before ft_strchr = %s\n", tmp->content);
 			if (ft_strchr(tmp->content, '\n'))
 			{
 				ret = 0;
-				printf("FT_STRCHR \\n kill the loop\n");
+				//printf("FT_STRCHR \\n kill the loop\n");
 			}
 		}
 	}
 
 	ret = punchline(lst, line);
+	if (!ret)
+	{
+		*line = NULL;
+	}
 
-	printf("##RET OF PUNCHLINE %d\n", ret);
+	//printf("##RET OF PUNCHLINE %d\n", ret);
 
 	return (ret);
 }
