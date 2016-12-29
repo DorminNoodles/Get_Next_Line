@@ -6,7 +6,7 @@
 /*   By: lchety <lchety@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/11 14:02:03 by lchety            #+#    #+#             */
-/*   Updated: 2016/12/21 17:59:18 by lchety           ###   ########.fr       */
+/*   Updated: 2016/12/29 14:29:29 by lchety           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,125 +19,85 @@
 
 int main(int argc, char **argv)
 {
-	int i = 0;
+	int i;
 	int ret;
 	int fd;
 	int fd2;
-	char *pathname = argv[1];
+	int *fd_tab;
 	// char *pathname2 = "test_file_02";
 	char *line;
 
 	//argv[0][0] = 'b';
 	fd = 0;
 	fd2 = 0;
-	ret = 0;
+	ret = 1;
 	line = NULL;
-	argc = 0;
-/*
-	i = 0;
-	while (i < 25)
+	i = 1;
+
+	//printf ("argc : %d", argc);
+	fd_tab = (int*)malloc(sizeof(int) * argc - 1);
+	if (!fd_tab)
+		return (0);
+	i = 1;
+	while (i < argc)
 	{
-		get_next_line(fd);
+		fd_tab[i - 1] = open(argv[i], O_RDONLY);
+		//printf("%d", fd)
 		i++;
 	}
-*/
-	fd = open(pathname, O_RDONLY);
-	//fd2 = open(pathname2, O_RDONLY);
-	while (i < 10)
+
+	i = 1;
+	while (ret)
 	{
-		printf("\n#####---->MAIN<----#####\n");
-		ret = get_next_line(fd, &line);
-		printf("\n");
-		printf("####GNL_LINE = %s\n", line);
-		printf("\n");
-		printf("#GNL : return %d", ret);
-		printf("\n\n");
-		i++;
+		ret = 0;
+		i = 1;
+
+		while (i < argc)
+		{
+			line = NULL;
+			if (get_next_line(fd_tab[i - 1], &line) == 1)
+				ret = 1;
+			i++;
+			printf("%s\n", line);
+			printf("return : %d\n", ret);
+			//free(line);
+		}
 	}
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-	//
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-	//
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-	//
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-	//
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-	//
-	// printf("\n#####---->MAIN<----#####\n");
-	// ret = get_next_line(fd, &line);
-	// printf("\n");
-	// printf("####GNL_LINE = %s\n", line);
-	// printf("\n");
-	// printf("#GNL : return %d", ret);
-	// printf("\n\n");
-
-/*
-	get_next_line(fd, &line);
-	printf("\n#####---->MAIN<----#####");
-	printf("\ntest = %s#bob\n", line);
-*/
-
-/*
-	get_next_line(fd, &line);
-	printf("\n#####---->MAIN<----#####");
-	printf("\ntest = %s#bob\n", line);
-*/
-
-	/*
-	get_next_line(fd, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd);
-	get_next_line(fd2, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd2);
-	get_next_line(fd, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd);
-	get_next_line(fd2, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd2);
-	get_next_line(fd, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd);
-	get_next_line(fd2, &line);
-	printf("test = %s\n", line);
-	printf("fd test = %d \n", fd2);
-*/
-
-
 	return (1);
 }
+
+/*
+static void test01(t_test *test)
+{
+	test->timeout = 1;
+
+	char *line;
+	int fd;
+	int fd2;
+	int fd3;
+	int	diff_file_size;
+
+	fd = open("sandbox/one_big_fat_line.txt", O_RDONLY);
+	fd2 = open("sandbox/one_big_fat_line.txt.mine", O_CREAT | O_RDWR | O_TRUNC, 0755);
+
+	while (get_next_line(fd, &line) == 1)
+	{
+	    write(fd2, line, strlen(line));
+	    write(fd2, "\n", 1);
+	}
+	if (line)
+		write(fd2, line, strlen(line));
+	close(fd);
+	close(fd2);
+
+	system("diff sandbox/one_big_fat_line.txt sandbox/one_big_fat_line.txt.mine > sandbox/one_big_fat_line.diff");
+	fd3 = open("sandbox/one_big_fat_line.diff", O_RDONLY);
+	diff_file_size = read(fd3, NULL, 10);
+	close(fd3);
+
+	mt_assert(diff_file_size == 0);
+}
+*/
 
 
 
