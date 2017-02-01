@@ -6,118 +6,106 @@
 /*   By: lchety <lchety@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/11 13:40:16 by lchety            #+#    #+#             */
-/*   Updated: 2016/12/29 12:13:10 by lchety           ###   ########.fr       */
+/*   Updated: 2017/01/05 10:59:15 by lchety           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "get_next_line.h"
-#include <stdio.h>
 
-int		find_fd(int fd, t_fd_lst *lst, t_fd_lst **tmp)
+int			my_read(t_fd_lst *lst)
 {
-	if (!lst)
-	{
-		*tmp = (t_fd_lst*)ft_memalloc(sizeof(t_fd_lst));
-		(*tmp)->next = NULL;
-		(*tmp)->content = NULL;
-		(*tmp)->fd = fd;
-		(*tmp)->eof = 0;
-		return (0);
-	}
-	if (lst->fd == fd)
-	{
-		*tmp = lst;
-		return (1);
-	}
-	return (find_fd(fd, lst->next, tmp));
-}
+	char		*tmp;
+	ssize_t		ret;
+	char		buff[BUFF_SIZE + 1];
 
-int		my_read(t_fd_lst *lst)
-{
-	char	*tmp;
-	size_t	ret;
-	char	buff[BUFF_SIZE + 1];
-
-	ret = 0;
-	ret = read(lst->fd, buff, BUFF_SIZE);
-	if ((int)ret == -1)
-		return (ret);
-	if (ret < BUFF_SIZE)
-		lst->eof = 1;
-	buff[ret] = '\0';
-	if (ret)
+	while ((ret = read(lst->fd, buff, BUFF_SIZE)) > 0)
 	{
+		buff[ret] = '\0';
 		tmp = lst->content;
 		if (lst->content)
-			lst->content = ft_strjoin(lst->content, buff);
+		{
+			if (!(lst->content = ft_strjoin(lst->content, buff)))
+				return (-1);
+			free(tmp);
+		}
 		else
 		{
 			lst->content = ft_strnew(ft_strlen(buff));
 			ft_strcpy(lst->content, buff);
 		}
-		if (tmp)
-			free(tmp);
+		if (ft_strchr(lst->content, '\n'))
+			return (1);
 	}
 	return (ret);
 }
 
-int		punchline(t_fd_lst *lst, char **line)
+int			punchline(t_fd_lst *lst, char **line)
 {
-	char *tmp;
-	char *cut;
+	char	*tmp;
+	char	*cut;
+	int		size;
 
-	if (lst->content == NULL || !*(lst->content))
-		return (0);
-	cut = ft_strchr(lst->content, '\n');
-	if (ft_strchr(lst->content, '\n'))
+	if ((cut = ft_strchr(lst->content, '\n')))
 	{
-		*line = (char*)ft_memalloc(sizeof(char) * (cut - lst->content) + 1);
-		*line = ft_strncpy(*line, lst->content, cut - lst->content);
-		*(*line + (cut - lst->content)) = '\0';
 		tmp = lst->content;
-		lst->content = (char*)ft_memalloc(sizeof(char) * ft_strlen(cut));
-		ft_strcpy(lst->content, cut + 1);
+		size = cut - lst->content;
+		if (!(*line = ft_strnew(sizeof(char) * size)))
+			return (-1);
+		ft_memcpy((void*)*line, (void*)lst->content, size);
+		if (!(lst->content = ft_strsub(lst->content, size + 1, ft_strlen(cut))))
+			return (-1);
 		free(tmp);
+		return (1);
 	}
-	else
+	else if (*(lst->content) != 0)
 	{
-		*line = (char*)ft_memalloc(sizeof(char) * (ft_strlen(lst->content) + 1 ));
-		*line = ft_strcpy(*line, lst->content);
-		ft_memdel((void*)&(lst->content));
+		if (!(*line = ft_strnew(sizeof(char) * ft_strlen(lst->content))))
+			return (-1);
+		ft_memcpy((void*)*line, (void*)lst->content, ft_strlen(lst->content));
+		ft_memdel((void**)&lst->content);
+		return (1);
 	}
-	return (1);
+	return (0);
 }
 
-int		get_next_line(int fd, char **line)
+t_fd_lst	*check_fd(t_fd_lst **lst, int fd)
 {
-	int ret;
-	static t_fd_lst	*lst = NULL;
-	t_fd_lst *tmp;
+	t_fd_lst	*tmp;
+
+	if (fd < 0)
+		return (NULL);
+	tmp = *lst;
+	while (tmp)
+	{
+		if (tmp->fd == fd)
+			return (tmp);
+		tmp = tmp->next;
+	}
+	if (!(tmp = (t_fd_lst*)ft_memalloc(sizeof(t_fd_lst))))
+		return (NULL);
+	tmp->fd = fd;
+	if (lst)
+		tmp->next = *lst;
+	*lst = tmp;
+	return (tmp);
+}
+
+int			get_next_line(int fd, char **line)
+{
+	int					ret;
+	static t_fd_lst		*lst = NULL;
+	t_fd_lst			*tmp;
 
 	ret = 1;
-	if (fd < 0 || !line)
+	if (!line)
 		return (-1);
-	if (!find_fd(fd, lst, &tmp))
-	{
-		if (lst)
-			tmp->next = lst;
-		lst = tmp;
-	}
-	if (!tmp->content)
-	{
-		ret = my_read(tmp);
-		if (ret == -1)
-			return (-1);
-		if (ret == 0)
-			return (0);
-	}
-	while (tmp->eof != 1 && !ft_strchr(tmp->content, '\n'))
-	{
-		ret = my_read(tmp);
-		if (ret == -1)
-			return (-1);
-	}
+	if (!(tmp = check_fd(&lst, fd)))
+		return (-1);
+	if ((ret = my_read(tmp)) < 1 && !tmp->content)
+		return (ret);
 	ret = punchline(tmp, line);
+	if (ret == 0)
+		ft_memdel((void**)&tmp->content);
 	return (ret);
 }
